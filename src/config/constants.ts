@@ -1,0 +1,10 @@
+export const MAX_SHAPES = 100
+export const MAX_HISTORY = 20
+export const MIN_SCALE = 10
+export const MAX_SCALE = 500
+export const DEFAULT_SCALE = 100
+export const AUTOSAVE_INTERVAL_MS = 60_000
+export const PARAMETER_DECIMALS = 2
+export const DEFAULT_GRID_STEP = 10
+export const DEFAULT_SNAP_DISTANCE = 8
+export const PROJECT_VERSION = 1
