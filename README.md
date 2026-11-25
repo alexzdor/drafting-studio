@@ -46,3 +46,25 @@ git push -u origin feature/your-feature
 Then create a Pull Request to merge your changes into `main`.
 
 
+
+## Каркас CHM
+
+Запуск из корня проекта с Node.js 22.12+ (ветка 22.x) или 24.x:
+
+```bash
+npm ci
+npm run dev
+```
+
+Сборка и проверки:
+
+```bash
+npm run build
+npm test
+npx playwright install chromium
+npm run test:e2e
+```
+
+Сквозные тесты запускают предварительный просмотр уже собранного `dist/`.
+
+В M01 создаются React-каркас, пустой проект и общие контракты для следующих модулей.
