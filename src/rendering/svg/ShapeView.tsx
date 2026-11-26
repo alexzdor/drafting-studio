@@ -1,4 +1,5 @@
 import type { Shape } from '../../types/geometry'
+import { pixelsPerUnit } from '../viewport/viewport'
 
 export function ShapeView({ shape, scale }: { shape: Shape; scale: number }) {
   const [first, second] = shape.vertices
@@ -7,7 +8,7 @@ export function ShapeView({ shape, scale }: { shape: Shape; scale: number }) {
 
   switch (shape.type) {
     case 'point':
-      return first ? <circle cx={first.x} cy={first.y} r={300 / scale} fill="currentColor" /> : null
+      return first ? <circle cx={first.x} cy={first.y} r={3 / pixelsPerUnit(scale)} fill="currentColor" /> : null
     case 'segment':
       return first && second ? <line x1={first.x} y1={first.y} x2={second.x} y2={second.y} {...line} /> : null
     case 'circle':

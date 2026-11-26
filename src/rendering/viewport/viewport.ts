@@ -10,8 +10,12 @@ export function clampScale(scale: number): number {
   return Math.min(MAX_SCALE, Math.max(MIN_SCALE, scale))
 }
 
+export function pixelsPerUnit(scale: number): number {
+  return 2.5 * (scale / 100)
+}
+
 export function worldToScreen(point: Point, viewport: Viewport): Point {
-  const factor = viewport.scale / 100
+  const factor = pixelsPerUnit(viewport.scale)
   return {
     x: viewport.origin.x + point.x * factor,
     y: viewport.origin.y - point.y * factor,
@@ -19,7 +23,7 @@ export function worldToScreen(point: Point, viewport: Viewport): Point {
 }
 
 export function screenToWorld(point: Point, viewport: Viewport): Point {
-  const factor = viewport.scale / 100
+  const factor = pixelsPerUnit(viewport.scale)
   return {
     x: (point.x - viewport.origin.x) / factor,
     y: (viewport.origin.y - point.y) / factor,

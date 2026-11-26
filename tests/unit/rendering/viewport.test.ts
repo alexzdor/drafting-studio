@@ -9,7 +9,7 @@ describe('viewport', () => {
   it('converts from Cartesian coordinates to the screen and back', () => {
     const point = { x: -18.5, y: 42 }
     const screen = worldToScreen(point, viewport)
-    expect(screen).toEqual({ x: 6.5, y: 158 })
+    expect(screen).toEqual({ x: -21.25, y: 95 })
     expect(screenToWorld(screen, viewport)).toEqual(point)
   })
 
@@ -33,8 +33,12 @@ describe('viewport', () => {
       properties: { radius: 25 }, annotations: [],
     }
     const fitted = fitDrawing([circle], { width: 200, height: 100 })
-    expect(fitted?.scale).toBe(180)
-    expect(fitted && worldToScreen(circle.vertices[0], fitted)).toEqual({ x: 100, y: 50 })
+    expect(fitted?.scale).toBe(72)
+    if (!fitted) throw new Error('Expected the circle to fit')
+    const center = worldToScreen(circle.vertices[0], fitted)
+    expect(center.x).toBeCloseTo(100)
+    expect(center.y).toBeCloseTo(50)
+    expect(worldToScreen({ x: 100, y: 75 }, fitted).y).toBeCloseTo(5)
     expect(fitDrawing([], { width: 200, height: 100 })).toBeNull()
   })
 

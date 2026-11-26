@@ -1,5 +1,5 @@
 import type { Shape } from '../../types/geometry'
-import { clampScale, type Viewport } from '../../rendering/viewport/viewport'
+import { clampScale, pixelsPerUnit, worldToScreen, type Viewport } from '../../rendering/viewport/viewport'
 
 export const ZOOM_STEP = 10
 
@@ -33,12 +33,16 @@ export function fitDrawing(
     size.width * 0.9 / Math.max(1, maxX - minX),
     size.height * 0.9 / Math.max(1, maxY - minY),
   )
-  const scale = clampScale(Math.floor(factor * 100))
+  const scale = clampScale(Math.floor(factor * 100 / pixelsPerUnit(100)))
+  const center = worldToScreen(
+    { x: (minX + maxX) / 2, y: (minY + maxY) / 2 },
+    { scale, origin: { x: 0, y: 0 } },
+  )
   return {
     scale,
     origin: {
-      x: size.width / 2 - (minX + maxX) * scale / 200,
-      y: size.height / 2 + (minY + maxY) * scale / 200,
+      x: size.width / 2 - center.x,
+      y: size.height / 2 - center.y,
     },
   }
 }

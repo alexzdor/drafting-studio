@@ -72,7 +72,7 @@ export function Workspace({
         aria-label="Рабочая область"
         viewport={viewport}
         elements={elements}
-        gridStep={settings.gridEnabled ? settings.snapping.gridStep : undefined}
+        grid={settings.gridEnabled ? { step: settings.snapping.gridStep, ...size } : undefined}
         overlay={renderOverlay?.(viewport)}
         onPointerDown={(event) => {
           if (drag.current) return

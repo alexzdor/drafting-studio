@@ -1,20 +1,30 @@
-import { useId } from 'react'
-import type { Viewport } from '../viewport/viewport'
+import { pixelsPerUnit, type Viewport } from '../viewport/viewport'
 
-export function GridLayer({ step, viewport }: { step: number; viewport: Viewport }) {
-  const patternId = useId()
-  const spacing = step * (viewport.scale / 100)
-  if (!Number.isFinite(spacing) || spacing <= 0) return null
+const MIN_GRID_SPACING = 10
+
+export function GridLayer({ step, viewport, width, height }: {
+  step: number
+  viewport: Viewport
+  width: number
+  height: number
+}) {
+  let spacing = step * pixelsPerUnit(viewport.scale)
+  if (!Number.isFinite(spacing) || spacing <= 0 || width <= 0 || height <= 0) return null
+
+  // At low zoom, draw every second grid line as often as needed to keep cells readable.
+  while (spacing < MIN_GRID_SPACING) spacing *= 2
+
+  const { x, y } = viewport.origin
+  const lines: string[] = []
+  for (let column = x - Math.floor(x / spacing) * spacing; column < width; column += spacing) {
+    lines.push(`M ${column} 0 V ${height}`)
+  }
+  for (let row = y - Math.floor(y / spacing) * spacing; row < height; row += spacing) {
+    lines.push(`M 0 ${row} H ${width}`)
+  }
 
   return (
-    <g pointerEvents="none" aria-hidden="true">
-      <defs>
-        <pattern id={patternId} width={spacing} height={spacing}
-          x={viewport.origin.x} y={viewport.origin.y} patternUnits="userSpaceOnUse">
-          <path d={`M ${spacing} 0 H 0 V ${spacing}`} fill="none" stroke="#64748b" strokeOpacity={0.60} />
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill={`url(#${patternId})`} />
-    </g>
+    <path d={lines.join(' ')} fill="none" stroke="#64748b" strokeOpacity={0.60}
+      shapeRendering="crispEdges" pointerEvents="none" aria-hidden="true" />
   )
 }
