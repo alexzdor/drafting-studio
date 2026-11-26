@@ -6,3 +6,4 @@ export type EditorAction =
   | { type: 'SET_TOOL'; tool: Tool }
   | { type: 'SET_SELECTION'; selection: Selection }
   | { type: 'SET_DIALOG'; dialog: DialogId }
+  | { type: 'SET_SCALE'; scale: number }

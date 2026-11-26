@@ -4,6 +4,7 @@ import {
   DEFAULT_SNAP_DISTANCE,
   PROJECT_VERSION,
 } from '../config/constants'
+import { clampScale } from '../rendering/viewport/viewport'
 import type { EditorState } from '../types/editor'
 import type { Project } from '../types/project'
 import type { EditorAction } from './actions'
@@ -56,5 +57,11 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
       return { ...state, selection: action.selection }
     case 'SET_DIALOG':
       return { ...state, dialog: action.dialog }
+    case 'SET_SCALE': {
+      if (!Number.isFinite(action.scale)) return state
+      const scale = clampScale(action.scale)
+      if (scale === state.project.settings.scale) return state
+      return { ...state, project: { ...state.project, settings: { ...state.project.settings, scale } } }
+    }
   }
 }

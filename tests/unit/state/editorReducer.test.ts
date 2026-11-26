@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { STORAGE_KEYS } from '../../../src/config/storageKeys'
 import { createEditorState, createEmptyProject, editorReducer } from '../../../src/state/editorReducer'
+import type { Project } from '../../../src/types/project'
 
 describe('editor state', () => {
   it('creates independent editable projects with versioned settings and canonical storage keys', () => {
@@ -26,5 +27,19 @@ describe('editor state', () => {
     const active = { ...first, dirty: true, history: [first.project], historyIndex: 0 }
     const next = createEmptyProject('Контрольный чертёж')
     expect(editorReducer(active, { type: 'REPLACE_PROJECT', project: next })).toEqual(createEditorState(next))
+  })
+
+  it('changes view scale without editing figure coordinates or changing the history', () => {
+    const project: Project = {
+      ...createEmptyProject(),
+      elements: [{ id: 'p', type: 'point', vertices: [{ x: 13, y: 29 }], properties: {}, annotations: [] }],
+    }
+    const state = createEditorState(project)
+    const next = editorReducer(state, { type: 'SET_SCALE', scale: 601 })
+    expect(next.project.settings.scale).toBe(500)
+    expect(next.project.elements).toBe(project.elements)
+    expect(next.history).toBe(state.history)
+    expect(next.dirty).toBe(false)
+    expect(editorReducer(next, { type: 'SET_SCALE', scale: NaN })).toBe(next)
   })
 })
