@@ -3,7 +3,7 @@ import { DrawingSvg } from '../../rendering/svg/DrawingSvg'
 import { useViewport } from '../../rendering/viewport/useViewport'
 import { screenToWorld, type Viewport } from '../../rendering/viewport/viewport'
 import { useEditor } from '../../state/useEditor'
-import type { Point } from '../../types/geometry'
+import type { Point, Shape } from '../../types/geometry'
 import { ZoomControl } from '../zoom/ZoomControl'
 import { fitDrawing, stepScale } from '../zoom/zoomMath'
 
@@ -13,9 +13,11 @@ export function Workspace({
   panEnabled = true,
   onWorkspacePointer,
   renderOverlay,
+  previewShape,
 }: {
   panEnabled?: boolean
   onWorkspacePointer?: WorkspacePointer
+  previewShape?: Shape
   renderOverlay?: (viewport: Viewport) => ReactNode
 }) {
   const { state, dispatch } = useEditor()
@@ -71,7 +73,7 @@ export function Workspace({
         className="drawing-canvas"
         aria-label="Рабочая область"
         viewport={viewport}
-        elements={elements}
+        elements={previewShape ? elements.map(shape => shape.id === previewShape.id ? previewShape : shape) : elements}
         grid={settings.gridEnabled ? { step: settings.snapping.gridStep, ...size } : undefined}
         overlay={renderOverlay?.(viewport)}
         onPointerDown={(event) => {
@@ -79,7 +81,6 @@ export function Workspace({
           if (panEnabled && event.button === 0 && event.target === event.currentTarget) {
             drag.current = { pointerId: event.pointerId, lastClient: { x: event.clientX, y: event.clientY } }
             event.currentTarget.setPointerCapture(event.pointerId)
-            return
           }
           forward('down', event)
         }}
@@ -102,6 +103,7 @@ export function Workspace({
         }}
         onLostPointerCapture={(event) => {
           if (drag.current?.pointerId === event.pointerId) drag.current = null
+          else forward('cancel', event)
         }}
       />
       <ZoomControl scale={settings.scale} onZoom={(scale) => (

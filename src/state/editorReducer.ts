@@ -3,6 +3,7 @@ import {
   DEFAULT_SCALE,
   DEFAULT_SNAP_DISTANCE,
   PROJECT_VERSION,
+  MAX_SHAPES,
 } from '../config/constants'
 import { clampScale } from '../rendering/viewport/viewport'
 import type { EditorState } from '../types/editor'
@@ -57,6 +58,25 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
       return { ...state, selection: action.selection }
     case 'SET_DIALOG':
       return { ...state, dialog: action.dialog }
+    case 'ADD_SHAPE':
+    case 'UPDATE_SHAPE': {
+      const { elements } = state.project
+      const index = elements.findIndex(element => element.id === action.shape.id)
+      const adding = action.type === 'ADD_SHAPE'
+      if (adding ? index !== -1 || elements.length >= MAX_SHAPES : index === -1) return state
+      return {
+        ...state,
+        tool: adding ? 'select' : state.tool,
+        selection: adding ? { elementIds: [action.shape.id], groupIds: [] } : state.selection,
+        dirty: true,
+        project: {
+          ...state.project,
+          updatedAt: action.updatedAt,
+          elements: adding ? [...elements, action.shape] : elements.map((element, position) =>
+            position === index ? action.shape : element),
+        },
+      }
+    }
     case 'SET_SCALE': {
       if (!Number.isFinite(action.scale)) return state
       const scale = clampScale(action.scale)
